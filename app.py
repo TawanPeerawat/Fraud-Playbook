@@ -1,78 +1,107 @@
+# Create a fully updated version of app.py following the 11-step framework logic
+
+app_py_updated = """\
 import streamlit as st
 import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Retail Fraud Strategy Builder", layout="centered")
 st.title("🛡️ Retail Fraud Strategy Builder")
 
-# Section 1: Business Goals
-st.header("1. Select Your Business Goals")
-business_goals = ["Efficiency", "Growth", "Customer Experience", "Risk Management", "Innovation"]
-selected_goals = st.multiselect("Choose business goals:", business_goals)
+# Step 1: Choose domain
+st.header("1. เลือกปัญหาหลัก")
+st.markdown("**Retail Fraud Risk** — การทุจริตภายในธุรกิจค้าปลีก")
 
-# Section 2: Use Cases
-use_case_map = {
-    "Efficiency": ["Reporting", "Process Analytics"],
-    "Growth": ["Customer Segmentation", "Predictive Models", "Cross-sell Analytics"],
-    "Customer Experience": ["Real-time Monitoring", "Personalization", "Generative AI"],
-    "Risk Management": ["Fraud Detection", "Compliance Analytics"],
-    "Innovation": ["Generative AI", "Optimization Models"]
+# Step 2: Select Internal vs External
+st.header("2. เลือกประเภท Fraud หลัก")
+fraud_group = st.radio("Fraud Type", ["Internal Fraud", "External Fraud"])
+
+# Step 3: Fraud Subtypes
+fraud_types = {
+    "Internal Fraud": [
+        "Inventory & Fulfillment Fraud",
+        "Insider / Collusion Fraud"
+    ],
+    "External Fraud": [
+        "Transaction Fraud",
+        "Promotion & Loyalty Fraud",
+        "Return & Refund Fraud",
+        "Digital & Channel-Specific Fraud"
+    ]
 }
-st.header("2. Choose Your Use Cases")
-selected_use_cases = []
-for goal in selected_goals:
-    st.markdown(f"**{goal} Use Cases**")
-    selected = st.multiselect(f"Select for {goal}", use_case_map.get(goal, []), key=goal)
-    selected_use_cases.extend(selected)
+selected_fraud_subtype = st.selectbox("3. เลือก Fraud Subtype", fraud_types[fraud_group])
 
-# Section 3: Risk Matrix
-st.header("3. Identify Fraud Risk vs Business Impact")
-risk_level = st.selectbox("Fraud Risk Level", ["Low", "High"])
-impact_level = st.selectbox("Business Impact", ["Low", "High"])
-
-quadrant_map = {
-    ("Low", "Low"): "🟢 Routine Monitoring",
-    ("High", "Low"): "⚫ Process Surveillance",
-    ("Low", "High"): "🟠 Strategic Control",
-    ("High", "High"): "🔴 Critical Watchlist"
+# Step 4: Specific Use Cases
+fraud_use_cases = {
+    "Inventory & Fulfillment Fraud": [
+        "พนักงานสลับสินค้าจริงเป็นของปลอม",
+        "รายงาน stock ผิดจากความเป็นจริง"
+    ],
+    "Insider / Collusion Fraud": [
+        "สมรู้ร่วมคิดกับ supplier (kickback, orderปลอม)",
+        "แก้ไขระบบ stock หรือโปรโมชั่นเพื่อลดหลักฐาน"
+    ],
+    "Transaction Fraud": [
+        "ปลอมแปลง slip การโอนเงิน",
+        "ออกใบเสร็จปลอม"
+    ],
+    "Promotion & Loyalty Fraud": [
+        "ใช้คูปองซ้ำโดยเปลี่ยนบัญชี",
+        "สร้างบัญชีปลอมเพื่อแลกของรางวัล"
+    ],
+    "Return & Refund Fraud": [
+        "ส่งคืนของปลอม / กล่องเปล่า",
+        "พนักงานอนุมัติ refund โดยไม่ตรวจสอบของจริง"
+    ],
+    "Digital & Channel-Specific Fraud": [
+        "ใช้ข้อมูลบัตรเครดิตที่ถูกขโมย"
+    ]
 }
-quadrant = quadrant_map[(risk_level, impact_level)]
-st.success(f"Your risk quadrant is: {quadrant}")
+st.header("4. เลือก Use Cases ที่เกี่ยวข้อง")
+selected_use_cases = st.multiselect("Use Cases", fraud_use_cases.get(selected_fraud_subtype, []))
 
-# Plot matrix
-fig, ax = plt.subplots()
-ax.set_title("Fraud Risk vs Business Impact")
-ax.set_xlabel("Business Impact")
-ax.set_ylabel("Fraud Risk Level")
-ax.set_xticks([0, 1])
-ax.set_yticks([0, 1])
-ax.set_xticklabels(["Low", "High"])
-ax.set_yticklabels(["Low", "High"])
-ax.grid(True)
-colors = {
-    ("Low", "Low"): "green",
-    ("High", "Low"): "black",
-    ("Low", "High"): "orange",
-    ("High", "High"): "red"
-}
-pos = {
-    ("Low", "Low"): (0.25, 0.25),
-    ("High", "Low"): (0.25, 0.75),
-    ("Low", "High"): (0.75, 0.25),
-    ("High", "High"): (0.75, 0.75)
-}
-x, y = pos[(risk_level, impact_level)]
-ax.scatter(x, y, color=colors[(risk_level, impact_level)], s=300)
-st.pyplot(fig)
+# Step 5: Reconfirm Focus Area
+st.header("5. ยืนยัน Problem Space ที่ต้องการโฟกัส")
+st.markdown(f"คุณกำลังโฟกัสที่: **{selected_fraud_subtype}**")
 
-# Section 4: Framework Summary
-if st.button("🚀 Generate Your Data Strategy"):
-    st.subheader("🎯 Your Personalized Data Strategy")
-    st.write("**Business Goals:**", ", ".join(selected_goals))
+# Step 6: Key Dimensions
+st.header("6. ระบุ Key Dimensions")
+dimensions = st.multiselect("เลือก Dimensions ที่เกี่ยวข้อง", ["Customer", "Process", "Technology", "Finance"])
+
+# Step 7: Select Models
+st.header("7. เลือก Model ที่เหมาะสม")
+models = st.multiselect("เลือกประเภทโมเดล", ["Analytical", "Behavioral", "Strategic", "Financial", "Process"])
+
+# Step 8: Visualization Method
+st.header("8. วิธีการ Visualization ที่เหมาะสม")
+viz = st.selectbox("เลือก Visualization", ["2x2 Matrix", "Flow Diagram", "Network Graph", "Timeline", "Bar/Heatmap"])
+
+# Step 9: Hypotheses
+st.header("9. ตั้งสมมติฐาน (Hypotheses)")
+hypo = st.text_area("เขียน Hypotheses หรือเงื่อนไขที่คิดว่าน่าจะทุจริต")
+
+# Step 10: Data Sources
+st.header("10. ระบุ Data Sources ที่ใช้วิเคราะห์")
+data_sources = st.multiselect("เลือกแหล่งข้อมูล", ["Order Logs", "Refund Records", "Customer Info", "Inventory Logs", "Card Transactions"])
+
+# Step 11: Generate Playbook
+if st.button("🚀 สร้าง Data Strategy Playbook"):
+    st.subheader("🎯 สรุป Framework & Strategy ของคุณ")
+    st.write("**Fraud Group:**", fraud_group)
+    st.write("**Subtype:**", selected_fraud_subtype)
     st.write("**Use Cases:**", ", ".join(selected_use_cases))
-    st.write("**Risk Quadrant:**", quadrant)
-    st.write("**Architecture:** Lakehouse + Stream Processing")
-    st.write("**Data Requirements:** Event Stream, Streaming Processing")
-    st.write("**Governance:** Moderate Governance")
+    st.write("**Key Dimensions:**", ", ".join(dimensions))
+    st.write("**Model Types:**", ", ".join(models))
+    st.write("**Visualization:**", viz)
+    st.write("**Hypothesis:**", hypo)
+    st.write("**Data Sources:**", ", ".join(data_sources))
 
-    with st.expander("🧠 Full Framework & Playbook Summary"):
+    with st.expander("📘 ดู Playbook Summary"):
         st.markdown(open("framework.md", encoding="utf-8").read())
+"""
+
+# Write to app.py
+with open("/mnt/data/retail_fraud_strategy_app/app.py", "w", encoding="utf-8") as f:
+    f.write(app_py_updated)
+
+# Re-zip the full project
+shutil.make_archive("/mnt/data/retail_fraud_strategy_app", 'zip', "/mnt/data/retail_fraud_strategy_app")
