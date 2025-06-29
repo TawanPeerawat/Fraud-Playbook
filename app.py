@@ -15,7 +15,8 @@ def clear_all():
 
 # Clear button
 if st.button("🧹 Clear All"):
-    clear_all()
+    for key in st.session_state.keys():
+        del st.session_state[key]
     st.rerun()
 
 # Step 1: Choose domain
