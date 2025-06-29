@@ -95,3 +95,11 @@ if st.button("🚀 สร้าง Data Strategy Playbook"):
     with st.expander("📘 ดู Playbook Summary"):
         with open("framework.md", "r", encoding="utf-8") as f:
             st.markdown(f.read())
+
+with st.expander("📘 ดู Playbook Summary"):
+    try:
+        with open("framework.md", "r", encoding="utf-8") as f:
+            st.markdown(f.read())
+    except FileNotFoundError:
+        st.warning("⚠️ ไม่พบไฟล์ framework.md กรุณาตรวจสอบว่าอยู่ใน repo เดียวกันกับ app.py")
+
