@@ -82,3 +82,10 @@ if st.button("🚀 Generate Strategy Summary"):
     st.markdown(f"**Visualization:** {viz}")
     st.markdown(f"**Hypothesis:** {hypo}")
     st.markdown(f"**Data Sources:** {', '.join(sources)}")
+
+with st.expander("📘 ดู Playbook Summary"):
+        try:
+            with open("framework.md", "r", encoding="utf-8") as f:
+                st.markdown(f.read())
+        except FileNotFoundError:
+            st.warning("⚠️ ไม่พบไฟล์ framework.md กรุณาตรวจสอบว่าอยู่ใน repo เดียวกันกับ app.py")
