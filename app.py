@@ -36,7 +36,7 @@ subtypes = {
 selected_subtype = st.selectbox("เลือก Fraud Subtype", subtypes[fraud_type])
 
 # --- Step 4 ---
-st.header("4. เลือก Use Cases ที่เกี่ยวข้อง")
+st.header("3. เลือก Use Cases ที่เกี่ยวข้อง")
 use_case_options = {
     "Inventory & Fulfillment Fraud": ["Stock Audit", "Fulfillment Alerts"],
     "Insider / Collusion Fraud": ["Access Monitoring", "Role Conflict Check"],
@@ -48,27 +48,27 @@ use_case_options = {
 use_case = st.selectbox("Use Cases", use_case_options.get(selected_subtype, []))
 
 # --- Step 5 ---
-st.header("5. ยืนยัน Problem Space ที่ต้องการโฟกัส")
+st.header("4. ยืนยัน Problem Space ที่ต้องการโฟกัส")
 st.markdown(f"คุณกำลังโฟกัสที่: **{selected_subtype}**")
 
 # --- Step 6 ---
-st.header("6. ระบุ Key Dimensions")
+st.header("5. ระบุ Key Dimensions")
 dimensions = st.multiselect("เลือก Dimensions ที่เกี่ยวข้อง", ["Customer", "Process", "Technology", "Finance"])
 
 # --- Step 7 ---
-st.header("7. เลือก Model ที่เหมาะสม")
+st.header("6. เลือก Model ที่เหมาะสม")
 models = st.multiselect("เลือกประเภทโมเดล", ["Analytical", "Behavioral", "Strategic", "Financial", "Process"])
 
 # --- Step 8 ---
-st.header("8. วิธีการ Visualization ที่เหมาะสม")
+st.header("7. วิธีการ Visualization ที่เหมาะสม")
 viz = st.selectbox("เลือก Visualization", ["Flow Diagram", "Fraud Tree", "Heatmap", "Graph Analysis"])
 
 # --- Step 9 ---
-st.header("9. ตั้งสมมติฐาน (Hypotheses)")
+st.header("8. ตั้งสมมติฐาน (Hypotheses)")
 hypo = st.text_area("เขียน Hypotheses หรือเงื่อนไขที่คิดว่าจะทุจริต")
 
 # --- Step 10 ---
-st.header("10. ระบุ Data Sources ที่ใช้วิเคราะห์")
+st.header("9. ระบุ Data Sources ที่ใช้วิเคราะห์")
 sources = st.multiselect("เลือกแหล่งข้อมูล", ["Transaction Data", "Customer Info", "Order Logs", "Device Fingerprint", "Promotion Logs"])
 
 # --- Output ---
