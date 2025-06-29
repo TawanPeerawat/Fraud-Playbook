@@ -91,11 +91,7 @@ if st.button("🚀 สร้าง Data Strategy Playbook"):
     st.write("**Visualization:**", viz)
     st.write("**Hypothesis:**", hypo)
     st.write("**Data Sources:**", ", ".join(data_sources))
-
-    with st.expander("📘 ดู Playbook Summary"):
-        with open("framework.md", "r", encoding="utf-8") as f:
-            st.markdown(f.read())
-
+    
 with st.expander("📘 ดู Playbook Summary"):
     try:
         with open("framework.md", "r", encoding="utf-8") as f:
