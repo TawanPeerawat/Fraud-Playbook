@@ -9,7 +9,7 @@ st.title("🤖 น้องแชตบอทรายงานยอดขา�
 st.markdown("AI จะช่วยสร้าง Python code และสรุปข้อมูลจาก DataFrame ให้คุณ!")
 
 try:
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    genai.configure(api_key=st.secrets["AIzaSyANjCc-PtzNhNqq27ow2SnyP1Pl96g0BJ8"])
     model = genai.GenerativeModel("gemini-2.0-flash-lite")
     st.success("✅ Gemini API Key ตั้งค่าเรียบร้อยแล้ว")
 except Exception as e:
