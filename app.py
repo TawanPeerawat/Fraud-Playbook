@@ -5,13 +5,13 @@ import google.generativeai as genai
 from datetime import datetime
 
 st.set_page_config(page_title="Gemini AI Python Code Generator for DataFrame", layout="wide")
-st.title("🤖 น้องแชตบอทรายงานยอดขาย")
+st.title("Fraud Freamwork")
 st.markdown("AI จะช่วยสร้าง Python code และสรุปข้อมูลจาก DataFrame ให้คุณ!")
 
 try:
-    genai.configure(api_key=st.secrets["AIzaSyANjCc-PtzNhNqq27ow2SnyP1Pl96g0BJ8"])
+    genai.configure(api_key="AIzaSyDhcBaFpk3YqRJtb6kLfQhbJSnGoklha8o")
     model = genai.GenerativeModel("gemini-2.0-flash-lite")
-    st.success("✅ Gemini API Key ตั้งค่าเรียบร้อยแล้ว")
+    st.success("Gemini API Key successfully configured!")
 except Exception as e:
     st.error(f"❌ เกิดปัญหาการตั้งค่า Gemini API: {e}")
     st.stop()
