@@ -71,7 +71,7 @@ if st.session_state.history:
 """
 
 # Save to file
-fraud_app_path = "/mnt/data/fraud_framework_ai_assistant.py"
+fraud_app_path = "/mnt/data/app.py"
 with open(fraud_app_path, "w", encoding="utf-8") as f:
     f.write(fraud_framework_app_code)
 
