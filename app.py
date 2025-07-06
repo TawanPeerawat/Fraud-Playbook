@@ -1,114 +1,78 @@
-
+# สร้างไฟล์ใหม่ที่ปรับเปลี่ยนเป็น Fraud Framework Assistant โดยใช้แนวทาง Chapter 5 - MADT7104
+fraud_framework_app_code = """
 import streamlit as st
-import pandas as pd
 import google.generativeai as genai
-from datetime import datetime
 
-st.set_page_config(page_title="Gemini AI Python Code Generator for DataFrame", layout="wide")
-st.title("Fraud Freamwork")
-st.markdown("AI จะช่วยสร้าง Python code และสรุปข้อมูลจาก DataFrame ให้คุณ!")
+st.set_page_config(page_title="Fraud Framework Assistant", layout="wide")
+st.title("🔍 Fraud Strategy Framework Assistant")
+st.markdown("AI จะช่วยวิเคราะห์ปัญหาทุจริตจาก Playbook และออกแบบแนวทางกลยุทธ์ โดยใช้แนวคิดจาก Chapter 5 - MADT7104")
 
+# Load Gemini API Key
 try:
-    genai.configure(api_key="AIzaSyDhcBaFpk3YqRJtb6kLfQhbJSnGoklha8o")
-    model = genai.GenerativeModel("gemini-2.0-flash-lite")
-    st.success("Gemini API Key successfully configured!")
+    genai.configure(api_key=st.secrets["AIzaSyANjCc-PtzNhNqq27ow2SnyP1Pl96g0BJ8
+ "])
+    model = genai.GenerativeModel("gemini-2.0-pro")
 except Exception as e:
-    st.error(f"❌ เกิดปัญหาการตั้งค่า Gemini API: {e}")
+    st.error(f"❌ ไม่สามารถตั้งค่า Gemini API: {e}")
     st.stop()
 
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+# Session state
+if "history" not in st.session_state:
+    st.session_state.history = []
 
-if "uploaded_data" not in st.session_state:
-    st.session_state.uploaded_data = None
+# Section: Input Problem Description
+st.header("1️⃣ ระบุปัญหาจาก Fraud Playbook")
+fraud_description = st.text_area("📝 ป้อนข้อความอธิบายปัญหาทุจริต (จาก Playbook, Observation หรือ Customer Painpoint)")
 
-try:
-    df_data = pd.read_csv("transactions.csv")
-    df_dict = pd.read_csv("data_dict.csv")
-    st.session_state.uploaded_data = df_data
+# Section: Select Focus Dimension
+st.header("2️⃣ ระบุ Focus Dimensions ตามแนวทาง MADT7104")
+dimensions = st.multiselect(
+    "เลือกมุมที่เกี่ยวข้องในการวิเคราะห์",
+    ["Customer", "Process", "Technology", "Finance", "People"]
+)
 
-    st.success("✅ โหลดไฟล์ transactions.csv และ data_dict.csv สำเร็จ")
-    st.write("### 👁️ Data Preview")
-    st.dataframe(df_data.head())
-    st.write("### 📖 Data Dictionary")
-    st.dataframe(df_dict.head())
-except Exception as e:
-    st.error(f"❌ โหลดไฟล์ไม่สำเร็จ: {e}")
-    df_data = None
-    df_dict = None
+# Section: Generate IPSO Strategy
+if st.button("🚀 Generate IPSO Framework Summary"):
+    if fraud_description:
+        with st.spinner("AI กำลังวิเคราะห์และออกแบบ Framework..."):
+            ipso_prompt = f'''
+You are a strategy consultant trained in MADT7104 - Chapter 5 (Designing with Data Technologies).
+Your job is to help identify IPSO elements (Input, Process, Storage, Output) for a fraud-related case.
 
-for role, message in st.session_state.chat_history:
-    with st.chat_message(role):
-        st.markdown(message)
+Fraud Description:
+{fraud_description}
 
-if user_input := st.chat_input("📨 พิมพ์คำถามเกี่ยวกับข้อมูลที่นี่..."):
-    st.session_state.chat_history.append(("user", user_input))
-    with st.chat_message("user"):
-        st.markdown(user_input)
+Selected Dimensions: {", ".join(dimensions)}
 
-    if model:
-        try:
-            if st.session_state.uploaded_data is not None:
-                df_name = "df_data"
-                data_dict_text = df_dict.to_string()
-                example_record = df_data.head(2).to_string()
+Please respond in Thai language and follow this structure:
+- 🎯 Problem Summary:
+- 📥 Input:
+- ⚙️ Process:
+- 🗂 Storage:
+- 📤 Output:
+- 🧠 Suggestion (เชิงกลยุทธ์):
+            '''
+            try:
+                response = model.generate_content(ipso_prompt)
+                summary = response.text
+                st.markdown(summary)
+                st.session_state.history.append(summary)
+            except Exception as e:
+                st.error(f"⚠️ Error from Gemini: {e}")
+    else:
+        st.warning("⚠️ กรุณาใส่ข้อมูลคำอธิบายปัญหา")
 
-                prompt = f"""
-You are a helpful Python code generator.
-Your goal is to write Python code snippets based on the user's question and the provided DataFrame information.
+# Section: History
+if st.session_state.history:
+    with st.expander("📚 ดูสรุปที่เคยวิเคราะห์"):
+        for item in st.session_state.history[::-1]:
+            st.markdown("---")
+            st.markdown(item)
+"""
 
-**User Question:** {user_input}
-**Main DataFrame (df_data):** {df_name}
-**Data Dictionary:** {data_dict_text}
-**Sample Data (Top 2 Rows):** {example_record}
+# Save to file
+fraud_app_path = "/mnt/data/fraud_framework_ai_assistant.py"
+with open(fraud_app_path, "w", encoding="utf-8") as f:
+    f.write(fraud_framework_app_code)
 
-**Instructions:**
-- Use `exec()` and store result in `ANSWER`
-- Do not import pandas
-- Use datetime if needed
-                """
-
-                response = model.generate_content([prompt, user_input])
-                generated_code = response.text
-
-                if "```python" in generated_code:
-                    code_block = generated_code.split("```python")[1].split("```")[0].strip()
-                else:
-                    code_block = generated_code.strip()
-
-                try:
-                    local_vars = {"df_data": df_data, "df_dict": df_dict, "ANSWER": None, "datetime": datetime}
-                    exec(code_block, globals(), local_vars)
-                    result = local_vars.get("ANSWER", "No result was stored in the ANSWER variable.")
-
-                    is_thai = any('฀' <= c <= '๿' for c in user_input)
-                    explain_prompt = f"""
-The user asked: {user_input}
-Here is the result: {str(result)}
-{'Respond in Thai language.' if is_thai else 'Respond in English.'}
-                    """
-
-                    explanation_response = model.generate_content(explain_prompt)
-                    explanation_text = explanation_response.text
-
-                    with st.chat_message("assistant"):
-                        if isinstance(result, pd.DataFrame):
-                            st.dataframe(result)
-                        elif hasattr(result, '__iter__') and not isinstance(result, str):
-                            st.write(result)
-                        else:
-                            st.write(result)
-
-                        st.markdown(explanation_text)
-                        st.session_state.chat_history.append(("assistant", explanation_text))
-
-                except Exception as code_exec_error:
-                    error_message = f"❌ Error executing generated code: {str(code_exec_error)}"
-                    st.error(error_message)
-                    st.session_state.chat_history.append(("assistant", f"Error: {error_message}"))
-            else:
-                st.error("⚠️ กรุณาโหลดข้อมูลก่อนใช้งาน")
-                st.session_state.chat_history.append(("assistant", "Data not loaded."))
-        except Exception as e:
-            st.error(f"❌ Error processing request: {str(e)}")
-            st.session_state.chat_history.append(("assistant", f"Error: {str(e)}"))
+fraud_app_path
