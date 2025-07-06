@@ -1,16 +1,13 @@
-# สร้างไฟล์ใหม่ที่ปรับเปลี่ยนเป็น Fraud Framework Assistant โดยใช้แนวทาง Chapter 5 - MADT7104
-fraud_framework_app_code = """
 import streamlit as st
 import google.generativeai as genai
 
-st.set_page_config(page_title="Fraud Framework Assistant", layout="wide")
-st.title("🔍 Fraud Strategy Framework Assistant")
-st.markdown("AI จะช่วยวิเคราะห์ปัญหาทุจริตจาก Playbook และออกแบบแนวทางกลยุทธ์ โดยใช้แนวคิดจาก Chapter 5 - MADT7104")
+st.set_page_config(page_title="Fraud Strategy Framework Assistant", layout="wide")
+st.title("🛡️ Retail Fraud Strategy Dashboard")
+st.markdown("วิเคราะห์และติดตามความเสี่ยง Fraud แบบ IPSO Framework + AI")
 
-# Load Gemini API Key
+# Load Gemini API
 try:
-    genai.configure(api_key=st.secrets["AIzaSyANjCc-PtzNhNqq27ow2SnyP1Pl96g0BJ8
- "])
+    genai.configure(api_key=st.secrets["AIzaSyANjCc-PtzNhNqq27ow2SnyP1Pl96g0BJ8"])
     model = genai.GenerativeModel("gemini-2.0-pro")
 except Exception as e:
     st.error(f"❌ ไม่สามารถตั้งค่า Gemini API: {e}")
@@ -20,19 +17,24 @@ except Exception as e:
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Section: Input Problem Description
-st.header("1️⃣ ระบุปัญหาจาก Fraud Playbook")
-fraud_description = st.text_area("📝 ป้อนข้อความอธิบายปัญหาทุจริต (จาก Playbook, Observation หรือ Customer Painpoint)")
+# Section: KPI Overview
+st.subheader("📊 Fraud KPIs")
+col1, col2, col3, col4, col5 = st.columns(5)
+col1.metric("Total Transactions", "156,789", "+5.2%")
+col2.metric("Fraud Detected", "234", "-2.1%")
+col3.metric("Fraud Rate", "0.15%", "-0.3%")
+col4.metric("Prevented Loss", "฿2.5M", "+12.5%")
+col5.metric("Risk Score", "7.2", "-1.2")
 
-# Section: Select Focus Dimension
-st.header("2️⃣ ระบุ Focus Dimensions ตามแนวทาง MADT7104")
-dimensions = st.multiselect(
-    "เลือกมุมที่เกี่ยวข้องในการวิเคราะห์",
-    ["Customer", "Process", "Technology", "Finance", "People"]
-)
+# Section: Input Fraud Scenario
+st.header("📝 ระบุปัญหาทุจริตที่พบ")
+fraud_description = st.text_area("เล่าเคสปัญหาที่ต้องการให้ AI วิเคราะห์:")
 
-# Section: Generate IPSO Strategy
-if st.button("🚀 Generate IPSO Framework Summary"):
+# Section: Choose Dimensions
+dimensions = st.multiselect("เลือกมุมวิเคราะห์:", ["Customer", "Process", "Technology", "Finance", "People"])
+
+# Section: Analyze with Gemini
+if st.button("🚀 วิเคราะห์ IPSO Framework ด้วย AI"):
     if fraud_description:
         with st.spinner("AI กำลังวิเคราะห์และออกแบบ Framework..."):
             ipso_prompt = f'''
@@ -60,19 +62,11 @@ Please respond in Thai language and follow this structure:
             except Exception as e:
                 st.error(f"⚠️ Error from Gemini: {e}")
     else:
-        st.warning("⚠️ กรุณาใส่ข้อมูลคำอธิบายปัญหา")
+        st.warning("⚠️ กรุณากรอกข้อมูลก่อนวิเคราะห์")
 
-# Section: History
+# History Section
 if st.session_state.history:
-    with st.expander("📚 ดูสรุปที่เคยวิเคราะห์"):
-        for item in st.session_state.history[::-1]:
+    with st.expander("📚 ผลลัพธ์ก่อนหน้า"):
+        for item in reversed(st.session_state.history):
             st.markdown("---")
             st.markdown(item)
-"""
-
-# Save to file
-fraud_app_path = "/mnt/data/app.py"
-with open(fraud_app_path, "w", encoding="utf-8") as f:
-    f.write(fraud_framework_app_code)
-
-fraud_app_path
