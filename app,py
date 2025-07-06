@@ -1,0 +1,123 @@
+# Rebuild the corrected app.py completely and save
+fixed_path = "/mnt/data/ai_dataframe_chat_assistant.py"
+
+corrected_code = '''
+import streamlit as st
+import pandas as pd
+import google.generativeai as genai
+from datetime import datetime
+
+st.set_page_config(page_title="Gemini AI Python Code Generator for DataFrame", layout="wide")
+st.title("🤖 น้องแชตบอทรายงานยอดขาย")
+st.markdown("AI จะช่วยสร้าง Python code และสรุปข้อมูลจาก DataFrame ให้คุณ!")
+
+try:
+    genai.configure(api_key=st.secrets["AIzaSyANjCc-PtzNhNqq27ow2SnyP1Pl96g0BJ8"])
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
+    st.success("✅ Gemini API Key ตั้งค่าเรียบร้อยแล้ว")
+except Exception as e:
+    st.error(f"❌ เกิดปัญหาการตั้งค่า Gemini API: {e}")
+    st.stop()
+
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+if "uploaded_data" not in st.session_state:
+    st.session_state.uploaded_data = None
+
+try:
+    df_data = pd.read_csv("transactions.csv")
+    df_dict = pd.read_csv("data_dict.csv")
+    st.session_state.uploaded_data = df_data
+
+    st.success("✅ โหลดไฟล์ transactions.csv และ data_dict.csv สำเร็จ")
+    st.write("### 👁️ Data Preview")
+    st.dataframe(df_data.head())
+    st.write("### 📖 Data Dictionary")
+    st.dataframe(df_dict.head())
+except Exception as e:
+    st.error(f"❌ โหลดไฟล์ไม่สำเร็จ: {e}")
+    df_data = None
+    df_dict = None
+
+for role, message in st.session_state.chat_history:
+    with st.chat_message(role):
+        st.markdown(message)
+
+if user_input := st.chat_input("📨 พิมพ์คำถามเกี่ยวกับข้อมูลที่นี่..."):
+    st.session_state.chat_history.append(("user", user_input))
+    with st.chat_message("user"):
+        st.markdown(user_input)
+
+    if model:
+        try:
+            if st.session_state.uploaded_data is not None:
+                df_name = "df_data"
+                data_dict_text = df_dict.to_string()
+                example_record = df_data.head(2).to_string()
+
+                prompt = f\"\"\"
+You are a helpful Python code generator.
+Your goal is to write Python code snippets based on the user's question and the provided DataFrame information.
+
+**User Question:** {user_input}
+**Main DataFrame (df_data):** {df_name}
+**Data Dictionary:** {data_dict_text}
+**Sample Data (Top 2 Rows):** {example_record}
+
+**Instructions:**
+- Use `exec()` and store result in `ANSWER`
+- Do not import pandas
+- Use datetime if needed
+                \"\"\"
+
+                response = model.generate_content([prompt, user_input])
+                generated_code = response.text
+
+                if "```python" in generated_code:
+                    code_block = generated_code.split("```python")[1].split("```")[0].strip()
+                else:
+                    code_block = generated_code.strip()
+
+                try:
+                    local_vars = {"df_data": df_data, "df_dict": df_dict, "ANSWER": None, "datetime": datetime}
+                    exec(code_block, globals(), local_vars)
+                    result = local_vars.get("ANSWER", "No result was stored in the ANSWER variable.")
+
+                    is_thai = any('\u0E00' <= c <= '\u0E7F' for c in user_input)
+                    explain_prompt = f\"\"\"
+The user asked: {user_input}
+Here is the result: {str(result)}
+{'Respond in Thai language.' if is_thai else 'Respond in English.'}
+                    \"\"\"
+
+                    explanation_response = model.generate_content(explain_prompt)
+                    explanation_text = explanation_response.text
+
+                    with st.chat_message("assistant"):
+                        if isinstance(result, pd.DataFrame):
+                            st.dataframe(result)
+                        elif hasattr(result, '__iter__') and not isinstance(result, str):
+                            st.write(result)
+                        else:
+                            st.write(result)
+
+                        st.markdown(explanation_text)
+                        st.session_state.chat_history.append(("assistant", explanation_text))
+
+                except Exception as code_exec_error:
+                    error_message = f"❌ Error executing generated code: {str(code_exec_error)}"
+                    st.error(error_message)
+                    st.session_state.chat_history.append(("assistant", f"Error: {error_message}"))
+            else:
+                st.error("⚠️ กรุณาโหลดข้อมูลก่อนใช้งาน")
+                st.session_state.chat_history.append(("assistant", "Data not loaded."))
+        except Exception as e:
+            st.error(f"❌ Error processing request: {str(e)}")
+            st.session_state.chat_history.append(("assistant", f"Error: {str(e)}"))
+'''
+
+with open(fixed_path, "w", encoding="utf-8") as f:
+    f.write(corrected_code)
+
+fixed_path
